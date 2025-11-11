@@ -1,5 +1,6 @@
 
-
+# Deal with compfix issues
+export ZSH_DISABLE_COMPFIX=true
 
 # Use tmux for fzf popups
 export FZF_TMUX=1
@@ -12,6 +13,7 @@ ZVM_VI_EDITOR=nvim
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
+#ZSH_TMUX_AUTOSTART="false"
 ZSH_TMUX_AUTOSTART="true"
 ZSH_TMUX_AUTOSTART_ONCE="true"
 ZSH_TMUX_DEFAULT_SESSION_NAME="dev"
@@ -103,7 +105,6 @@ plugins=(
   copyfile
   brew
   kubectl
-  fd
   fasd
   tmux
   gh
@@ -116,7 +117,6 @@ plugins=(
   pyenv
   pre-commit
   pylint
-  ripgrep
   golang
   ssh
   virtualenv
@@ -154,12 +154,15 @@ export EDITOR='nvim'
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+alias vim="nvim"
+alias vi="nvim"
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 #[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 #
 PATH=$(
   cat <<EOF
-/usr/local/opt/grep/libexec/gnubin:/usr/local/opt/gnu-sed/libexec/gnubin:/usr/local/opt/coreutils/libexec/gnubin:/Users/randall/.krew/bin:/Users/randall/bin:/Users/randall/go-workspace/bin:/Applications/Wireshark.app/Contents/MacOS:/usr/local/MacGPG2/bin:/usr/local/opt/gnu-getopt/bin:/usr/local/bin:/usr/local/sbin/:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/opt/go/libexec
+/opt/homebrew/bin:/opt/homebrew/opt/grep/libexec/gnubin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:/usr/local/opt/coreutils/libexec/gnubin:/Users/randall/.krew/bin:/Users/randall/bin:/Users/randall/go-workspace/bin:/Applications/Wireshark.app/Contents/MacOS:/usr/local/MacGPG2/bin:/opt/homebrew/opt/gnu-getopt/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/local/sbin/:/bin:/sbin:/usr/bin:/usr/sbin:/opt/homebrew/opt/go/libexec
 EOF
 )
 
@@ -170,8 +173,8 @@ export PATH
 
 export GOPATH="${HOME}/go-workspace"
 export GOBIN="${GOPATH}/bin"
-export GOROOT="/usr/local/opt/go/libexec"
-export PATH="/usr/local/opt/helm@2/bin:$PATH"
+export GOROOT="/opt/homebrew/opt/go/libexec"
+export PATH="/opt/homebrew/opt/helm@2/bin:$PATH"
 #
 #
 # All sorts of color!
@@ -232,13 +235,13 @@ function edit-command-line-inplace() {
   fi
   () {
     emulate -L zsh -o nomultibyte
-    local editor=("${(@Q)${(z)${VISUAL:-${EDITOR:-vi}}}}") 
+    local editor=("${(@Q)${(z)${VISUAL:-${EDITOR:-vi}}}}")
     case $editor in
       (*vim*)
         "${(@)editor}" -c "normal! $(($#LBUFFER + 1))go" -- $1
       ;;
       (*emacs*)
-        local lines=("${(@f)LBUFFER}") 
+        local lines=("${(@f)LBUFFER}")
         "${(@)editor}" +${#lines}:$((${#lines[-1]} + 1)) $1
       ;;
       (*)
@@ -257,3 +260,15 @@ bindkey -M vicmd ^F edit-command-line
 eval "$(zoxide init zsh)"
 
 #alias cd="z"
+#
+
+HISTFILE="${HOME}/.zhistory"
+SAVEHIST="10000"
+HISTSIZE="9999"
+setopt share_history
+setopt hist_expire_dups_first
+setopt hist_ignore_dups
+setopt hist_verify
+
+bindkey '^[[A' history-search-backward
+bindkey '^[[B' history-search-forward
